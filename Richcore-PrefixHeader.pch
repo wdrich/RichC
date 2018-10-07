@@ -1,0 +1,136 @@
+//
+//  Richcore-PrefixHeader.pch
+//  richcore
+//
+//  Created by WangDong on 2018/5/8.    
+//  Copyright © 2018年 WangDong. All rights reserved.
+//
+
+#ifndef Richcore_PrefixHeader_pch
+#define Richcore_PrefixHeader_pch
+
+    #ifdef __OBJC__
+    #import <UIKit/UIKit.h>
+    #import <Foundation/Foundation.h>
+    #import "RCHUrls.h"
+    #import "RCHDevice.h"
+    #import "RCHApp.h"
+    #import "RCHError.h"
+    #import "RCHNotifications.h"
+    #import "RCHColor.h"
+    #import "RCHFont.h"
+    #import "RCHConst.h"
+    #import "RCHEnum.h"
+    #import "RCHCurrentUser.h"
+
+    //additions
+    #import "NSStringAdditions.h"
+    #import "MBProgressHUD+WD.h"
+    #import "UIButton+WD.h"
+    #import "UIView+GestureCallback.h"
+    #import "UIView+WDFrame.h"
+    #import "UIViewAdditions.h"
+    #import "WDAlertController.h"
+    #import "JSONKit.h"
+
+    //base
+    #import "NSErrorAdditions.h"
+    #import "RCHGlobal.h"
+    #import "RCHHelper.h"
+    #import "RCHBaseViewController.h"
+    #import "RCHNavigationController.h"
+    #import "RCHWebViewController.h"
+    #import "WDRequestManager.h"
+    #import "RCHNavigationBar.h"
+    #import "RCHBlankPageView.h"
+
+    // libs
+    #import <AFNetworking.h>
+    #import <IQKeyboardManager.h>
+    #import <MJExtension.h>
+    #import <MBProgressHUD.h>
+    #import <MJRefresh.h>
+    #import <Masonry.h>
+    #import <Appsee/Appsee.h>
+    #import <UIImageView+WebCache.h>
+    #import <YYCategories.h>
+    #import <YYImage.h>
+    #import <YYText.h>
+    #import <Toast.h>
+
+    #endif
+
+//#define TEST_MODE_CORP //测试版本发布模式，与以下打印信息开关没有关系
+
+#endif /* Richcore_PrefixHeader_pch */
+
+#if DEBUG
+    #define NSLog(FORMAT, ...) fprintf(stderr,"\nfunction:%s line:%d content:%s\n", __FUNCTION__, __LINE__, [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
+#else
+    #define NSLog(FORMAT, ...) nil
+#endif
+
+
+#define PATH_AT_APPDIR(name)        [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:name]
+#define PATH_AT_DOCDIR(name)        [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:name]
+#define PATH_AT_TMPDIR(name)        [NSTemporaryDirectory() stringByAppendingPathComponent:name]
+#define PATH_AT_CACHEDIR(name)        [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:name]
+#define PATH_AT_LIBDIR(name)        [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:name]
+
+#define IMAGE_AT_APPDIR(name)       [RCHHelper imageAtApplicationDirectoryWithName:name]
+#define RCHIMAGEWITHNAMED(name)     [UIImage imageNamed:[NSString stringWithFormat:@"%@.png", name]]
+#define RGBA(r,g,b,a)               [UIColor colorWithRed:(float)r/255.0f green:(float)g/255.0f blue:(float)b/255.0f alpha:a]
+
+#define DEBUG_REQUEST_INFO(urlString,httpInfo) NSLog(@"%@\n%@",urlString,httpInfo) //打开收到URL的调试信息
+#define DEBUG_RECEIVE_DATA(receivedata) NSLog(@"%@",[[NSString alloc] initWithData:receivedata encoding:NSUTF8StringEncoding])  //打开收到数据的调试信息
+
+#define DismissModalViewControllerAnimated(controller,animated) [controller dismissViewControllerAnimated:animated completion:nil]
+#define PresentModalViewControllerAnimated(controller1,controller2,animated)     [RCHHelper presentModalViewRootController:controller1 toViewController:controller2 Animated:animated];
+
+//弱引用/强引用  可配对引用在外面用RCHWeak(self)，block用RCHStrongSelf(self)  或者也可以单独引用在外面用RCHWeak(self) block里面用weakself
+#define RCHWeak(type)  __weak typeof(type) weak##type = type
+
+/**
+ *  属性转字符串
+ */
+#define RCHKeyPath(obj, key) @(((void)obj.key, #key))
+
+#ifdef DEBUG
+
+#define NSLogFunc NSLog(@"=====Begin==========\n FILE: %@\n FUNC: %s\n LINE: %d\n", [NSString stringWithUTF8String:__FILE__].lastPathComponent, __PRETTY_FUNCTION__, __LINE__)
+
+#else
+
+#define NSLogFunc
+
+#endif
+
+
+#define RCHDispatch_main_sync_safe(block)\
+if ([NSThread isMainThread]) {\
+block();\
+} else {\
+dispatch_sync(dispatch_get_main_queue(), block);\
+}
+
+#define RCHDispatch_main_async_safe(block)\
+if ([NSThread isMainThread]) {\
+block();\
+} else {\
+dispatch_async(dispatch_get_main_queue(), block);\
+}
+
+
+//不同屏幕尺寸字体适配
+#define kScreenWidthRatio  (UIScreen.mainScreen.bounds.size.width / 375.0)
+#define kScreenHeightRatio (UIScreen.mainScreen.bounds.size.height / 667.0)
+#define AdaptedWidth(x)  ceilf((x) * kScreenWidthRatio)
+#define AdaptedHeight(x) ceilf((x) * kScreenHeightRatio)
+#define AdaptedFontSize(R)     [UIFont systemFontOfSize:AdaptedWidth(R)]
+
+//是否是空对象
+#define RCHIsEmpty(_object) (_object == nil \
+|| [_object isKindOfClass:[NSNull class]] \
+|| ([_object respondsToSelector:@selector(length)] && [(NSData *)_object length] == 0) \
+|| ([_object respondsToSelector:@selector(count)] && [(NSArray *)_object count] == 0))
+
